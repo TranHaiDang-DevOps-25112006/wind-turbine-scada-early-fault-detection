@@ -1,4 +1,7 @@
-# Nhật ký công việc nhóm
+# Nhật ký thực hành cá nhân (Hải Đăng) - Tuần 1 (Ngày 1 -> Ngày 5)
 
-| Ngày | Người phụ trách | Việc đã làm | File thay đổi | Kết quả / vấn đề | Việc tiếp theo |
-|---|---|---|---|---|---|
+| Ngày       | Việc đã thực hiện                                                                                  | File thay đổi                               | Kết quả & Lỗi đã giải quyết trên máy                                                                             | Nội dung sẽ chia sẻ cuối tuần                                             |
+| ---------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| **Ngày 1** | Khởi tạo repo GitHub cá nhân từ template; thiết lập quy ước độc lập trong tuần.                    | `README.md`, `docs/TEAM_RULES.md`           | Repo cá nhân hoạt động tốt, push code ban đầu thành công.                                                        | Tầm quan trọng của việc giữ cấu trúc thư mục cố định.                     |
+| **Ngày 2** | Cài môi trường `.venv`, cài `requirements.txt`, bổ sung file `.env.example`.                       | `.env.example`, `.env`, `docs/DECISIONS.md` | Fix lỗi Python 3.13 hạ xuống 3.11; fix lỗi `cd /d` ổ D trên CMD và đường dẫn Unix trên Git Bash. Test import OK. | Hướng dẫn nhóm cách chuyển ổ đĩa trên CMD/Bash và lý do dùng Python 3.11. |
+| **Ngày 3** | Tải dataset `CARE_To_Compare.zip` từ Zenodo, giải nén vào `data/raw/` trên ổ D, quét kiểm kê file. | `docs/WORK_LOG.md`, `docs/DECISIONS.md`     | Dữ liệu giải nén an toàn vào `data/raw/`; file `.gitignore` chặn chuẩn không bị commit dữ liệu nặng.             | Đối chiếu dung lượng giải nén và danh sách tệp nguồn với nhóm.            |
