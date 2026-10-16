@@ -1,0 +1,26 @@
+project:
+  name: wind_turbine_scada_early_fault_detection
+  random_seed: 42
+  timezone: UTC
+
+data:
+  raw_dir: data/raw
+  interim_dir: data/interim
+  processed_dir: data/processed
+  sample_dir: data/sample
+  timestamp_column: timestamp  # XÁC NHẬN lại từ dữ liệu thực tế trước khi dùng
+  asset_id_column: asset_id     # XÁC NHẬN lại từ dữ liệu thực tế trước khi dùng
+  status_column: status_id      # XÁC NHẬN lại từ dữ liệu thực tế trước khi dùng
+  split_column: train_test      # XÁC NHẬN lại từ dữ liệu thực tế trước khi dùng
+
+model:
+  primary: isolation_forest
+  contamination: 0.01
+  n_estimators: 200
+  random_state: 42
+
+alert:
+  threshold_strategy: validation_quantile
+  consecutive_points: 3
+  cooldown_points: 6
+  note: "Các ngưỡng trên là giá trị khởi đầu để thử nghiệm, không phải thông số vận hành an toàn."
