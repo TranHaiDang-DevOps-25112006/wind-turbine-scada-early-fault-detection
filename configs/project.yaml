@@ -8,10 +8,12 @@ data:
   interim_dir: data/interim
   processed_dir: data/processed
   sample_dir: data/sample
-  timestamp_column: timestamp  # XÁC NHẬN lại từ dữ liệu thực tế trước khi dùng
-  asset_id_column: asset_id     # XÁC NHẬN lại từ dữ liệu thực tế trước khi dùng
-  status_column: status_id      # XÁC NHẬN lại từ dữ liệu thực tế trước khi dùng
-  split_column: train_test      # XÁC NHẬN lại từ dữ liệu thực tế trước khi dùng
+  csv_sep: ";" # Dấu phân cách thực tế của CARE To Compare
+  timestamp_column: time_stamp # Đã xác nhận từ file SCADA thực tế
+  asset_id_column: asset_id # Đã xác nhận: mã tua-bin (asset_id)
+  row_id_column: id # Đã xác nhận: mã thứ tự dòng (id)
+  status_column: status_type_id # Đã xác nhận: trạng thái vận hành (0 = normal)
+  split_column: train_test # Đã xác nhận: phân chia 'train' và 'prediction'
 
 model:
   primary: isolation_forest
