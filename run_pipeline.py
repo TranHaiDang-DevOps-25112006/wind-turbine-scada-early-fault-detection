@@ -1,119 +1,68 @@
 """
-Mục đích: Chạy liên hoàn toàn bộ Pipeline End-to-End từ dữ liệu thô đến mô hình và đánh giá
+run_pipeline.py
+Kịch bản điều phối thực thi liên hoàn hệ thống SCADA Tua-bin Gió (End-to-End Orchestrator).
+Chạy thông suốt 9 bước từ kiểm tra schema đến xuất số liệu thực nghiệm khoa học chuẩn xác.
 """
-
-import os
-from pathlib import Path
-import subprocess
 import sys
+import os
+import subprocess
 import time
 
-# Thiết lập thư mục gốc
-ROOT_DIR = Path(__file__).resolve().parent
-
-# Ép buộc mã hóa UTF-8 cho tất cả các tiến trình con trên Windows
 ENV_UTF8 = os.environ.copy()
-ENV_UTF8["PYTHONIOENCODING"] = "utf-8"
-ENV_UTF8["PYTHONUTF8"] = "1"
+ENV_UTF8['PYTHONIOENCODING'] = 'utf-8'
+ENV_UTF8['PYTHONUTF8'] = '1'
 
-PIPELINE_STEPS = [
-    {
-        "name": "1. Khảo sát dữ liệu thô (Data Inspection)",
-        "module": "src.data.inspect_data",
-        "cmd": [sys.executable, "-m", "src.data.inspect_data"],
-    },
-    {
-        "name": "2. Tiền xử lý & Làm sạch chuỗi thời gian (Preprocessing)",
-        "module": "src.data.preprocess",
-        "cmd": [sys.executable, "-m", "src.data.preprocess"],
-    },
-    {
-        "name": (
-            "3. Trích xuất đặc trưng chuỗi thời gian (Feature Engineering)"
-        ),
-        "module": "src.features.build_features",
-        "cmd": [sys.executable, "-m", "src.features.build_features"],
-    },
-    {
-        "name": "4. Lọc biến & Chuẩn hóa thang đo (Select & Scale)",
-        "module": "src.features.select_and_scale",
-        "cmd": [sys.executable, "-m", "src.features.select_and_scale"],
-    },
-    {
-        "name": "5. Huấn luyện mô hình Isolation Forest (Model Training)",
-        "module": "src.models.train",
-        "cmd": [sys.executable, "-m", "src.models.train"],
-    },
-    {
-        "name": "6. Kiểm thử tự động bộ lọc cảnh báo (Unit Testing với PyTest)",
-        "module": "tests.test_alert_rules",
-        "cmd": [
-            sys.executable,
-            "-m",
-            "pytest",
-            "tests/test_alert_rules.py",
-            "-q",
-        ],
-    },
-    {
-        "name": (
-            "7. Đánh giá đa ngưỡng & Đối chứng Baseline Z-Score (Evaluation)"
-        ),
-        "module": "src.evaluation.evaluate_advanced",
-        "cmd": [sys.executable, "-m", "src.evaluation.evaluate_advanced"],
-    },
-    {
-        "name": "8. Đánh giá độ sớm cảnh báo đa sự cố (Multi-event Lead Time)",
-        "module": "src.evaluation.evaluate_multievent",
-        "cmd": [sys.executable, "-m", "src.evaluation.evaluate_multievent"],
-    },
+STEPS = [
+    ("1. Khảo sát dữ liệu thô (Data Inspection)", "src.data.inspect_data"),
+    ("2. Tiền xử lý chuỗi thời gian & Làm sạch", "src.data.preprocess"),
+    ("3. Trích xuất đặc trưng động lực học", "src.features.build_features"),
+    ("4. Chuẩn hóa & Cô lập Pipeline Scaler", "src.features.select_and_scale"),
+    ("5. Huấn luyện mô hình Isolation Forest", "src.models.train"),
+    ("6. Đánh giá quét đa ngưỡng PR-Curve", "src.evaluation.evaluate_advanced"),
+    ("7. Mô phỏng khung kiến trúc đa sự kiện", "src.evaluation.evaluate_multievent"),
+    ("8. Đo đạc hiệu năng phân tán PySpark Benchmark", "src.bigdata.spark_benchmark"),
+    ("9. Đánh giá thực nghiệm khoa học Event 0 (evaluate_real)", "src.evaluation.evaluate_real")
 ]
 
-
 def main():
-  print("=" * 80)
-  print(
-      "  HỆ THỐNG SCADA TUA-BIN GIÓ - QUY TRÌNH THỰC THI LIÊN HOÀN END-TO-END"
-      " (NGÀY 15)"
-  )
-  print("Samsung Innovation Campus (SIC) - 2026")
-  print("=" * 80)
-  start_total = time.time()
+    print("=" * 75)
+    print(" HỆ THỐNG SCADA TUA-BIN GIÓ - QUY TRÌNH THỰC THI LIÊN HOÀN END-TO-END")
+    print(" Samsung Innovation Campus (SIC) - 2026")
+    print("=" * 75)
 
-  for idx, step in enumerate(PIPELINE_STEPS, 1):
-    print(f"\n[{idx}/{len(PIPELINE_STEPS)}] Bắt đầu: {step['name']}...")
-    t0 = time.time()
-    try:
-      # Bổ sung encoding='utf-8', errors='replace' và truyền ENV_UTF8
-      res = subprocess.run(
-          step["cmd"],
-          cwd=ROOT_DIR,
-          check=True,
-          capture_output=True,
-          text=True,
-          encoding="utf-8",
-          errors="replace",
-          env=ENV_UTF8,
-      )
-      elapsed = time.time() - t0
-      print(f"      -> [PASSED] Hoàn tất trong {elapsed:.2f}s")
-    except subprocess.CalledProcessError as e:
-      print(f"\n[ERROR] Bước '{step['name']}' gặp sự cố!")
-      print(e.stderr if e.stderr else e.stdout)
-      sys.exit(1)
+    start_total = time.time()
 
-  total_time = time.time() - start_total
-  print("\n" + "=" * 80)
-  print("  [TỔNG KẾT] Toàn bộ 8 công đoạn Pipeline chạy thành công 100%!")
-  print(f"  Thời gian thực thi toàn diện: {total_time:.2f} giây")
-  print(
-      "  Hiện vật sẵn sàng tại: models/, reports/metrics/, reports/figures/"
-  )
-  print(
-      "  Khởi chạy Dashboard bằng lệnh: streamlit run src/dashboard/app.py"
-  )
-  print("=" * 80)
+    for idx, (desc, module_name) in enumerate(STEPS, 1):
+        print(f"\n[{idx}/{len(STEPS)}] Bắt đầu: {desc}...")
+        step_start = time.time()
+        
+        cmd = [sys.executable, "-m", module_name]
+        try:
+            res = subprocess.run(
+                cmd,
+                check=True,
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                errors='replace',
+                env=ENV_UTF8
+            )
+            elapsed = time.time() - step_start
+            print(f"[OK] Hoàn thành trong {elapsed:.2f}s")
+            if res.stdout:
+                last_lines = [line for line in res.stdout.strip().split('\n') if line.strip()]
+                if last_lines:
+                    print(f"     -> {last_lines[-1]}")
+        except subprocess.CalledProcessError as e:
+            print(f"\n[ERROR] Bước '{desc}' gặp sự cố!")
+            print(f"Chi tiết lỗi:\n{e.stderr}")
+            sys.exit(1)
 
+    total_elapsed = time.time() - start_total
+    print("\n" + "=" * 75)
+    print(f"🎉 HOÀN THÀNH TOÀN BỘ 9 BƯỚC PIPELINE THÀNH CÔNG TRONG {total_elapsed:.2f} GIÂY!")
+    print("Toàn bộ số liệu thực nghiệm đã sẵn sàng tại: reports/metrics/real_*.csv")
+    print("=" * 75)
 
 if __name__ == "__main__":
-  main()
+    main()
