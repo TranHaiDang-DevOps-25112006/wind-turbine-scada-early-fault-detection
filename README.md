@@ -11,7 +11,7 @@ Xây dựng pipeline nghiên cứu phát hiện bất thường sớm từ dữ 
 1. Không sửa cấu trúc thư mục này trong suốt dự án; chỉ điền nội dung vào các file đã có.
 2. Không đưa dữ liệu gốc dung lượng lớn lên Git (đã chặn qua `.gitignore`).
 3. Mỗi thành viên chỉ commit phần việc của mình; không sửa file của người khác khi chưa thống nhất.
-4. Chạy lệnh từ thư mục gốc dự án (`wind_scada_team_template/`).
+4. Chạy lệnh từ thư mục gốc dự án.
 5. Mọi kết quả cuối cùng phải có thể tái tạo bằng cấu hình và seed cố định (`random_state=42`).
 
 ## Cài đặt môi trường
@@ -29,12 +29,14 @@ Xây dựng pipeline nghiên cứu phát hiện bất thường sớm từ dữ 
 
 ### 1. Chạy liên hoàn toàn bộ Pipeline (End-to-End Runner)
 
-Chỉ cần **một câu lệnh duy nhất** để tự động thực thi 8 công đoạn liên hoàn từ dữ liệu thô, tiền xử lý, trích xuất đặc trưng, huấn luyện Isolation Forest, kiểm thử đơn vị, đến quét đa ngưỡng và đánh giá độ sớm đa sự kiện:
+Chỉ cần **một câu lệnh duy nhất** để tự động thực thi 9 công đoạn liên hoàn: khảo sát dữ liệu, tiền xử lý, đặc trưng, chuẩn hóa, huấn luyện, đánh giá đa ngưỡng (evaluate_advanced), đa sự kiện minh họa (evaluate_multievent), benchmark PySpark, evaluate_real:
+
+> **Chạy kiểm thử đơn vị:** `python -m pytest tests/ -q`
 
 ```powershell
 $env:PYTHONIOENCODING = "utf-8"
 python run_pipeline.py
-```
 
 -Khởi chạy giao diện điều hành tương tác thời gian thực trên trình duyệt web (http://localhost:8501):
 streamlit run src/dashboard/app.py
+```

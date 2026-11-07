@@ -2,6 +2,10 @@
 src/bigdata/spark_benchmark.py
 Kịch bản đo đạc và đối chứng hiệu năng xử lý chuỗi thời gian giữa Pandas và Apache PySpark.
 
+Ghi chú:
+- Cửa sổ rolling của Pandas và Spark đều theo số hàng (6 bản ghi).
+- Thời gian Spark ở chế độ local[*], không phải cụm phân tán.
+- Không dùng cache().
 """
 import os
 import sys
@@ -38,9 +42,10 @@ def benchmark_pandas(file_path):
     t_agg = time.time() - t3
     
     total = time.time() - t0
-    return {"engine": "Pandas", "rows": len(df), "read_sec": round(t_read, 4), 
-            "clean_sec": round(t_clean, 4), "feature_sec": round(t_feat, 4), 
-            "agg_sec": round(t_agg, 4), "total_sec": round(total, 4)}
+    return {"engine": "Pandas", "rows": len(df), "init_sec": 0.0,
+            "read_sec": round(t_read, 6), 
+            "clean_sec": round(t_clean, 6), "feature_sec": round(t_feat, 6), 
+            "agg_sec": round(t_agg, 6), "total_sec": round(total, 6)}
 
 def benchmark_pyspark(file_path):
     from pyspark.sql import SparkSession
@@ -53,6 +58,10 @@ def benchmark_pyspark(file_path):
         .master("local[*]") \
         .config("spark.driver.memory", "4g") \
         .getOrCreate()
+    init_sec = time.time() - t0
+    
+    # Đặt lại t0 để đo riêng thời gian đọc CSV (không tính khởi tạo Spark)
+    t0 = time.time()
     
     # 1. Đọc dữ liệu & lưu trước số dòng n_rows
     df_sp = spark.read.csv(str(file_path), header=True, sep=';')
@@ -82,15 +91,16 @@ def benchmark_pyspark(file_path):
     _ = df_agg.count()
     t_agg = time.time() - t3
     
-    total = time.time() - t0
+    total = init_sec + (time.time() - t0)
     
     # Đóng SparkSession an toàn sau khi đã hoàn tất các phép tính
     spark.stop()
     
     # Dùng biến n_rows đã lưu sẵn, không gọi df_sp.count() lại khi Spark đã dừng
-    return {"engine": "PySpark", "rows": n_rows, "read_sec": round(t_read, 4), 
-            "clean_sec": round(t_clean, 4), "feature_sec": round(t_feat, 4), 
-            "agg_sec": round(t_agg, 4), "total_sec": round(total, 4)}
+    return {"engine": "PySpark", "rows": n_rows, "init_sec": round(init_sec, 6),
+            "read_sec": round(t_read, 6), 
+            "clean_sec": round(t_clean, 6), "feature_sec": round(t_feat, 6), 
+            "agg_sec": round(t_agg, 6), "total_sec": round(total, 6)}
 
 def main():
     if not SAMPLE_PATH.exists():

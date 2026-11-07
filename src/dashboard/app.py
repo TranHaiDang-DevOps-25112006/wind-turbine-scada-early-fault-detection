@@ -35,7 +35,9 @@ def load_event0_data():
     return df
 
 def generate_mock_event(event_id):
-    """Mô phỏng dữ liệu giao diện cho các sự cố mở rộng."""
+    """Mô phỏng dữ liệu giao diện cho các sự cố mở rộng.
+    Dữ liệu mô phỏng, không phải kết quả mô hình trên dữ liệu thật.
+    """
     date_rng = pd.date_range(start="2023-05-01", periods=1500, freq='10min')
     np.random.seed(event_id)
     base_score = np.random.normal(loc=-0.05, scale=0.03, size=len(date_rng))
@@ -71,7 +73,7 @@ threshold_val = st.sidebar.slider("Ngưỡng rủi ro (Threshold):", min_value=-
 consecutive_pts = st.sidebar.number_input("Số chu kỳ liên tiếp (3 kỳ = 30p):", min_value=1, max_value=6, value=3)
 cooldown_pts = st.sidebar.number_input("Thời gian nghỉ sau cảnh báo (6 kỳ = 1h):", min_value=1, max_value=12, value=6)
 
-st.sidebar.info("💡 **Ghi chú vận hành:** Luật 3 chu kỳ liên tiếp và cooldown 1h giúp triệt tiêu 92.1% báo động giả do xung gió giật.")
+st.sidebar.info("💡 **Ghi chú vận hành:** Luật 3 chu kỳ liên tiếp + cooldown 6 bản ghi dùng để giảm cảnh báo lặp; mức giảm chưa được định lượng.")
 
 # LOAD DỮ LIỆU
 if selected_event == 0:
@@ -123,7 +125,20 @@ else:
 kpi1, kpi2, kpi3, kpi4, kpi5 = st.columns(5)
 kpi1.metric("📍 Tua-bin Giám Sát", f"WTG_{selected_event:02d}")
 kpi2.metric("⏱️ Lead Time Dừng Máy", f"{lead_time_days:.2f} Ngày")
-kpi3.metric("🎯 Độ Chính Xác (Precision)", "97.5%" if selected_event == 0 else "N/A")
+# Đọc Precision từ file seed stability nếu có
+_precision_display = "97.45% (cấp bản ghi, seed 42, giá trị lưu sẵn)"
+try:
+    _seed_csv_path = ROOT_DIR / "reports" / "metrics" / "real_seed_stability.csv"
+    if _seed_csv_path.exists():
+        _seed_df = pd.read_csv(_seed_csv_path)
+        _row42 = _seed_df[_seed_df["seed"] == 42]
+        if len(_row42) > 0:
+            _raw_prec = float(_row42.iloc[0]["raw_precision"])
+            _precision_display = f"{_raw_prec * 100:.2f}% (cấp bản ghi, seed 42)"
+except Exception:
+    pass  # Giữ giá trị lưu sẵn, dashboard không crash
+
+kpi3.metric("🎯 Độ Chính Xác (Precision)", _precision_display if selected_event == 0 else "N/A")
 kpi4.metric("🚨 Tổng Cảnh Báo", f"{total_alerts} Lần")
 kpi5.metric("🔥 Cảnh Báo Cấp HIGH", f"{high_alerts} Điểm", delta=f"{delay_days:.2f}d trễ" if delay_days > 0 else "0d")
 

@@ -22,7 +22,7 @@ def run_feature_selection_and_scaling(
     # 1. Danh sách các cột Metadata không đưa vào mô hình X
     metadata_cols = ["id", "time_stamp", "asset_id", "train_test", "status_type_id"]
     
-    # 2. Danh sách các cột loại bỏ do Đa cộng tuyến hoàn hảo (r = 1.00 từ Ngày 5)
+    # Loại wind_speed_4_avg theo khảo sát Ngày 5 (tương quan rất cao, ~0.986 trên mẫu; danh sách cố định, không phải bộ lọc đa cộng tuyến tự động)
     collinear_cols = ["wind_speed_4_avg"]
     drop_cols = [c for c in (metadata_cols + collinear_cols) if c in train_df.columns]
 

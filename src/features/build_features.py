@@ -17,7 +17,7 @@ def extract_domain_features(df):
     # 1. Nhóm đặc trưng nhiệt độ tương đối (Relative Temperature)
     # sensor_0_avg là Nhiệt độ môi trường (Ambient Temperature)
     if "sensor_0_avg" in df.columns:
-        # Ví dụ sensor_6_avg là nhiệt độ ổ trục/vỏ máy (r = 0.93 với ambient temp)
+        # sensor_6_avg: nhiệt độ bộ điều khiển hub (hub controller), không phải nhiệt độ ổ trục
         if "sensor_6_avg" in df.columns:
             df["sensor_6_delta_ambient"] = df["sensor_6_avg"] - df["sensor_0_avg"]
         if "sensor_7_avg" in df.columns:

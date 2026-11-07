@@ -22,7 +22,7 @@ model:
   random_state: 42
 
 alert:
-  threshold_strategy: validation_quantile
+  threshold_strategy: fixed
   consecutive_points: 3
   cooldown_points: 6
-  note: "Các ngưỡng trên là giá trị khởi đầu để thử nghiệm, không phải thông số vận hành an toàn."
+  note: "Ngưỡng thực tế = 0.0 (evaluate_real.py); chưa có tập validation riêng. Tham số mô hình đang viết trực tiếp trong src/models/train.py, không đọc từ file này."
