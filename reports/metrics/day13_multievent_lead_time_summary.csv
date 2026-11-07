@@ -1,0 +1,5 @@
+event_id,component,status,lead_time_days
+0,Vòng bi máy phát (Bearing),Thực nghiệm thật,13.14
+3,Hộp số (Gearbox),Mô phỏng kiến trúc,11.78
+14,Thủy lực (Hydraulic),Mô phỏng kiến trúc,5.54
+17,Biến áp (Transformer),Mô phỏng kiến trúc,0.69

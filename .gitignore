@@ -22,7 +22,10 @@ logs/*
 !logs/.gitkeep
 reports/figures/*
 !reports/figures/.gitkeep
+!reports/figures/*.png
 reports/tables/*
 !reports/tables/.gitkeep
+!reports/tables/*.csv
 reports/metrics/*
 !reports/metrics/.gitkeep
+!reports/metrics/*.csv

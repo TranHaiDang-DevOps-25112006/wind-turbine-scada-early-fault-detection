@@ -1,0 +1,8 @@
+Loại kiểm thử,Ca kiểm thử,Kết quả mong đợi,Kết quả thực tế,Trạng thái
+Ingestion,Đọc từng CSV; kiểm tra schema và cột bắt buộc,Đọc thành công khi hợp lệ; báo lỗi rõ khi thiếu file/cột,ĐẠT (Kiểm tra 86 cột của sample_event_0.csv chuẩn xác),PASSED
+Data quality,"Xử lý Null, sắp xếp timestamp và lọc trùng lặp","Khử NaN bằng ffill(limit=3), sắp xếp chuỗi tăng dần",ĐẠT (0 bản ghi trùng; không còn NaN trên tập scaled),PASSED
+Temporal split,Kiểm tra rò rỉ thời gian (Anti Data Leakage),Train.max_time <= Prediction.min_time,ĐẠT (Train kết thúc trước Prediction bắt đầu),PASSED
+Model,Kiểm toán tính tái lập (Reproducibility with seed=42),Điểm số Anomaly Score giống nhau 100% qua 2 lần chạy,ĐẠT (Sai số tuyệt đối sai lệch = 0.0000000),PASSED
+Alert Rules,"Phòng vệ biên (Chuỗi rỗng, toàn NaN, xung 1 điểm)",Không văng crash; dập tắt xung nhiễu thành công,ĐẠT (6/6 ca kiểm thử biên chạy qua trong <0.5s),PASSED
+Dashboard,Kiểm tra tệp hiện vật phục vụ Streamlit UI,"prediction_scored.parquet có đủ time_stamp, score","ĐẠT (Đủ 111 cột, render mượt mà dưới 0.5s)",PASSED
+End-to-end,Thực thi liên hoàn 8 bước qua run_pipeline.py,Chạy thông suốt từ Raw CSV đến biểu đồ reports/,ĐẠT (Hoàn thành 8/8 bước trong ~10.8 giây),PASSED
